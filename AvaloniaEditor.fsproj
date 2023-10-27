@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="TextEditor.fs" />
+    <Compile Include="Menu.fs" />
+    <Compile Include="Domain.fs" />
+    <Compile Include="View.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.2" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.2" />
+        <PackageReference Include="Avalonia.FuncUI" Version="1.0.0" />
+        <PackageReference Include="Avalonia.FuncUI.Elmish" Version="1.0.0" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.1" />
+    </ItemGroup>
+
+</Project>
