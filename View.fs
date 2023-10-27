@@ -11,6 +11,9 @@ let view (state: State) dispatch =
             Menu.view ()
             TextEditor.create [
                 TextEditor.showLineNumbers true
+                TextEditor.onTextInput (fun e ->
+                    // Reset Delay
+                    ())
             ]
         ]
     ]
