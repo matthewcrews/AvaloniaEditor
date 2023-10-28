@@ -1,17 +1,24 @@
 namespace AvaloniaEditor
 
+open Avalonia.FuncUI
+
 type State = {
-    Items: string list
+    Text: string option
 }
 
 type Msg =
-    | Hello of string
+    | NewText of string
 
 module State =
 
     let init () =
         {
-            Items = []
+            Text = None
         }
 
-    let update (msg: Msg) (s: State) = s
+    let update (msg: Msg) (state: State) : State =
+
+        match msg with
+        | Msg.NewText newText ->
+            { state with
+                Text = Some newText }
