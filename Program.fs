@@ -4,6 +4,7 @@
 open Avalonia
 open Avalonia.Themes.Fluent
 open Avalonia.Threading
+open AvaloniaEdit
 open Elmish
 open Avalonia.FuncUI.Hosts
 open Avalonia.FuncUI
@@ -23,9 +24,9 @@ type MainWindow() as this =
             let editorChangeStream (dispatch: Msg -> unit) =
                 model.EditorChangeStream
                     .Throttle(TimeSpan.FromSeconds 1)
-                    .Subscribe(fun txt ->
+                    .Subscribe(fun (editor: TextEditor) ->
                         Dispatcher.UIThread.Invoke(fun () ->
-                            dispatch IncrementCounter
+                            dispatch (ApplyChanges editor)
                         )
                     )
 

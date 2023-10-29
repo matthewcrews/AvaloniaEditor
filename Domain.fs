@@ -10,11 +10,12 @@ type Model =
     {
         Text: string
         Counter: int
-        EditorChangeStream: Subject<string>
+        EditorChangeStream: Subject<TextEditor>
     }
 
 type Msg =
     | EditorChanged of TextEditor
+    | ApplyChanges of TextEditor
     | IncrementCounter
 
 module Model =
@@ -23,13 +24,17 @@ module Model =
         {
             Text = ""
             Counter = 0
-            EditorChangeStream = new Subject<string>()
+            EditorChangeStream = new Subject<TextEditor>()
         }, Cmd.none
 
     let update msg model =
         match msg with
         | EditorChanged textEditor ->
-            { model with Text = textEditor.Text },
-                Cmd.ofEffect (fun _ -> model.EditorChangeStream.OnNext(textEditor.Text))
+            { model with Counter = model.Counter + 1 },
+                Cmd.ofEffect (fun _ -> model.EditorChangeStream.OnNext(textEditor))
+        | ApplyChanges textEditor ->
+                { model with Text = textEditor.Text },
+                    Cmd.none
         | IncrementCounter ->
-            { model with Counter = model.Counter + 1 }, Cmd.none
+            { model with Counter = model.Counter + 1 },
+                Cmd.none
