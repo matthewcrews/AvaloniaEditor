@@ -3,6 +3,7 @@
 
 open Avalonia
 open Avalonia.Themes.Fluent
+open Avalonia.Threading
 open Elmish
 open Avalonia.FuncUI.Hosts
 open Avalonia.FuncUI
@@ -23,7 +24,9 @@ type MainWindow() as this =
                 model.EditorChangeStream
                     .Throttle(TimeSpan.FromSeconds 1)
                     .Subscribe(fun txt ->
-                        dispatch IncrementCounter
+                        Dispatcher.UIThread.Invoke(fun () ->
+                            dispatch IncrementCounter
+                        )
                     )
 
             [
