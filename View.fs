@@ -1,10 +1,11 @@
 module AvaloniaEditor.View
 
+open System.Reactive.Subjects
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL
 open AvaloniaEdit
 
-let view (model: Model) (dispatch) =
+let view (subject: Subject<TextEditor>) (model: Model) (dispatch) =
     let mutable editor = Unchecked.defaultof<TextEditor>
 
     DockPanel.create [
@@ -15,7 +16,7 @@ let view (model: Model) (dispatch) =
                     editor <- newEditor)
                 TextEditor.showLineNumbers true
                 TextEditor.onTextInput (fun _ ->
-                    dispatch (EditorChanged editor)
+                    subject.OnNext editor
                 )
             ]
         ]

@@ -1,6 +1,5 @@
 ﻿module AvaloniaEditor.Menu
 
-open System
 open Avalonia.Layout
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL

@@ -1,6 +1,7 @@
 ﻿namespace AvaloniaEditor
 
 
+open System.Reactive.Subjects
 open Avalonia
 open Avalonia.Themes.Fluent
 open Avalonia.Threading
@@ -20,25 +21,25 @@ type MainWindow() as this =
         base.Height <- 600.0
         base.Width <- 800.0
 
+        let editorChangeStream = new Subject<TextEditor>()
+
         let subscriptions (model: Model) : Sub<Msg> =
             let editorChangeStream (dispatch: Msg -> unit) =
-                model.EditorChangeStream
+                editorChangeStream
                     .Throttle(TimeSpan.FromSeconds 1)
                     .Subscribe(fun (editor: TextEditor) ->
-                        Dispatcher.UIThread.Invoke(fun () ->
-                            dispatch (ApplyChanges editor)
-                        )
+                        dispatch (ApplyChanges editor)
                     )
 
             [
                 [ nameof editorChangeStream ], editorChangeStream
             ]
 
-        Elmish.Program.mkProgram Model.init Model.update View.view
+        Elmish.Program.mkSimple Model.init Model.update (View.view editorChangeStream)
         |> Program.withHost this
         |> Program.withConsoleTrace
         |> Program.withSubscription subscriptions
-        |> Program.run
+        |> Program.runWithAvaloniaSyncDispatch ()
 
 type App() =
     inherit Application()
