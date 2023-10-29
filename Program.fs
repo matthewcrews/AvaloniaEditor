@@ -16,7 +16,7 @@ type MainWindow() as this =
         base.Height <- 600.0
         base.Width <- 800.0
 
-        Elmish.Program.mkSimple State.init State.update View.view
+        Elmish.Program.mkProgram Model.init Model.update View.view
         |> Program.withHost this
         |> Program.withConsoleTrace
         |> Program.run

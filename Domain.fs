@@ -1,24 +1,35 @@
 namespace AvaloniaEditor
 
+open System
+open AvaloniaEdit
+open Elmish
+open System.Reactive.Subjects
 open Avalonia.FuncUI
 
-type State = {
-    Text: string option
-}
+type Model =
+    {
+        Text: string
+        Counter: int
+        EditorChangeStream: Subject<string>
+    }
 
 type Msg =
-    | NewText of string
+    | EditorChanged of TextEditor
+    | IncrementCounter
 
-module State =
+module Model =
 
-    let init () =
+    let init() =
         {
-            Text = None
-        }
+            Text = ""
+            Counter = 0
+            EditorChangeStream = new Subject<string>()
+        }, Cmd.none
 
-    let update (msg: Msg) (state: State) : State =
-
+    let update msg model =
         match msg with
-        | Msg.NewText newText ->
-            { state with
-                Text = Some newText }
+        | EditorChanged textEditor ->
+            { model with Text = textEditor.Text },
+                Cmd.ofEffect (fun _ -> model.EditorChangeStream.OnNext(textEditor.Text))
+        | IncrementCounter ->
+            { model with Counter = model.Counter + 1 }, Cmd.none

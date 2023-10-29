@@ -1,40 +1,48 @@
 module AvaloniaEditor.View
 
-open System.Timers
+open Elmish
+open System
+open Avalonia.FuncUI.Elmish
+open Avalonia.Layout
 open Avalonia.Controls
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
-open AvaloniaEditor
+open Avalonia.FuncUI.Types
+open Avalonia.FuncUI.Elmish.ElmishHook
+open System.Reactive.Subjects
+open System.Reactive.Linq
 open AvaloniaEdit
 
-let view (state: State) (dispatch: Msg -> State -> State) =
-    let mutable editor = Unchecked.defaultof<TextEditor>
 
-    DockPanel.create [
-        DockPanel.children [
-            Menu.view ()
-            Component.create ("text editor", fun ctx ->
-                let timer =
-                    ctx.useState (
-                        initialValue = (
-                            let timer = new Timer(Interval = 1_000, AutoReset = false)
-                            timer.Elapsed.Add (fun _ ->
-                                let editorText = editor.Text
-                                dispatch (Msg.NewText editorText) state
-                            )
-                            timer
-                        ),
-                        renderOnChange = false
-                    )
+let private subscriptions (model: Model) : Sub<Msg> =
+    let editorChangeStream (dispatch: Msg -> unit) =
+        model.EditorChangeStream
+            .Throttle(TimeSpan.FromSeconds 1)
+            .Subscribe(fun txt ->
+                dispatch IncrementCounter
+            )
 
+    [
+        [ nameof editorChangeStream ], editorChangeStream
+    ]
+
+
+let view (model: Model) (dispatch) =
+    Component (fun ctx ->
+        let model, dispatch = ctx.useElmish(Model.init, Model.update, Program.withSubscription subscriptions)
+        let mutable editor = Unchecked.defaultof<TextEditor>
+
+
+        DockPanel.create [
+            DockPanel.children [
+                Menu.view ()
                 TextEditor.create [
                     TextEditor.init (fun newEditor ->
                         editor <- newEditor)
                     TextEditor.showLineNumbers true
                     TextEditor.onTextInput (fun _ ->
-                        timer.Current.Interval <- 1_000.0
-                        timer.Current.Start()
+                        dispatch (EditorChanged editor)
                     )
-                ])
-        ]
-    ]
+                ]
+            ]
+        ])
